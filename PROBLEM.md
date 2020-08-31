@@ -1,108 +1,205 @@
-### Problem Statement
+### Problem Statement - Query Parsing with TDD Approach
 
-String Parsing  (Query string)
+As an initial step of building a utility, to get meaningful information out of our raw data, you should be able to parse (decipher) our question. 
+
+In our computing terms, we call this a query.
+
+Our system should be able to interpret this and break it into several parts - so that necessary actions can be triggered to fetch the required information in the proper format.
+
+Also, the solution has to be designed following **TDD Approach**
+
+Hence, the cadet is expected to first write the test cases for the stated requirements and then develop the solution
+
+Refer to the section below for more on this problem statement
+
+#### Deciphering the parts of the string (Query)
+
+Please note that the end user interacting with this utility will give out **SQL** like instructions and would expect the system to respond with necessary information. 
+
+The system perceives this as a string of characters and we should manipulate and break this string into appropriate Data Structures. 
+
+For Instance,
+
+Query: **SELECT winner, Count( winner ) FROM ipl.csv WHERE win_by_runs > 100 GROUP BY winner ORDER BY winner;**
+
+Sample Data: 
+
+|    winner                   |Count(winner)|
+|:----------------------------|------------:|
+|Kings XI Punjab              |   1         |     
+|Kolkata Knight Riders        |   1         |
+|Rajasthan Royals             |   1         |
+|Royal Challengers Bangalore  |   3         |
 
 
-## Our task 1 involves three steps, given below:
+Query: **SELECT city, winner FROM ipl.csv WHERE winner='Chennai Super Kings' AND city ='Abu Dhabi' AND season=2014;**
 
-1) Write a program to read the query string as input and split them into words. Print the output on the console as given below:
+Sample Data: 
 
-    Input String : 	select * from ipl.csv where season > 2014 and city = 'Bangalore'
+|    city      |  winner            |
+|:-------------|-------------------:|
+|Abu Dhabi     | Chennai Super Kings|
+
+-----------
+
+Few terms need to understand before starting the project.
+
+    1.select -> get the required information
+
+    2.'*' -> select all the fields 
+
+    3.where -> filter result
+
+    4.order by -> sort the result based on particular field
+
+    5.group by -> get the records together based on the particular field.
+
+    6.aggregate -> There are 5 aggregates,they are "sum,count,min,max,avg".  
+
+    7.Example query string : select season,winner,player_match from ipl.csv where season > 2014 and city = 'Bangalore';
+
+        a. fetching season, winner, player_match 
+
+        b. from the file ipl.csv (csv -> Comma Separated Value)
+
+        c. where - filter the results. Get the details of the matches played in Bangalore after season 2014
+        
+        d. ipl.csv - a name of the file from which we need to fetch the information/records
+
+-----------
+
+#### Step-1 involves three tasks, given below:
+
+1. Write code to read the query string as input and split them into words. Print the output on the console as given below:
+
+	    Input String : select * from ipl.csv where season > 2014 and city = 'Bangalore'
     
-    Output String: select
+   		Output String: select
     			    	 * 
-    			     from 
-    			     ipl.csv  
-    			     where  
-    			     season
-    			     > 
-    			     2014
-    			     and 
-    			     city
-    			     =
-    			     'bangalore'
+    				     from 
+    				     ipl.csv  
+    				     where  
+    			    	 season
+    			    	 > 
+    			    	 2014
+    			    	 and 
+    			    	 city
+    			    	 =
+    			    	 'bangalore'
 
-2) Further enhance your program to extract certain parts of the same query:
+2. Further, enhance your program to now extract certain parts of the same query:
 
 	i. Get only file name from the query string.
 	
 		Input String : select * from ipl.csv where season > 2014 and city = 'Bangalore'
 		Output String : ipl.csv
 	
-3) Get only base part(before `where` word) of the query from the given query string. 
+3. Get only base part (before `where` word) of the query from the given query string. 
 
 		Input String : select * from ipl.csv where season > 2014 and city = 'Bangalore'
 		Output String : select * from ipl.csv 
 
-dotnet test --filter "FullyQualifiedName~test.DbEngineTask1Test"
 -----------------------------------------------------------------------------------
 
-## Our task II involves three steps, given below:
+#### Step-2 involves two tasks, given below:            
 
-1)Extract the selected fields/information from the given query.
+1. Extract the selected fields/information from the given query.
 
-     Input String : select city,winner,player_match from ipl.csv where season > 2014 
-                    and city ='Bangalore'
-	Output String :	city
-            			winner
-            			player_match
+    	Input String : select city,winner,player_match from ipl.csv where season > 2014 and city = 'Bangalore'
+		Output String :	city
+						winner
+           				player_match
 
-
-2)Get only filter part(after `where` word before'group by or order by' if they exist 
-  in the query) of the query from the given query string. 
+2. Get only filter part(after `where` word before'group by or order by' if they exist in the query) of the query from the given query string. 
 	
-		Input String : select * from ipl.csv where season > 2014 and city ='Bangalore'
+		Input String : select * from ipl.csv where season > 2014 and city = 'Bangalore'
 		Output String : season > 2014 and city ='bangalore'
 		
-		Input String : select city from ipl.csv where season > 2014 or city ='Bangalore'
-		               order by city
-		Output String : season > 2014 or city ='bangalore
+		Input String : select city from ipl.csv where season > 2014 or city = 'Bangalore' order by city
+		Output String : season > 2014 or city = 'bangalore
 
 
-3) As there will be multiple conditions, separate each condition and display in different line.
+3) As there will be multiple conditions, separate each condition and display in the different line.
 	    
-	    Input String : select * from ipl.csv where season > 2014 and city ='Bangalore'
+	    Input String : select * from ipl.csv where season > 2014 and city = 'Bangalore'
 		Output String : season > 2014 
-                         city ='bangalore'
-                         
-dotnet test --filter "FullyQualifiedName~test.DbEngineTask2Test"
------------------------------------------------------------------------------------ 
+                        city ='bangalore'
 
-##Our task III involves two steps, given below:            
+-----------------------------------------------------------------------------------
+ 
+#### Step-3 involves two tasks, given below:            
 		               
-1)Extract the logical operators in sequence from the given query string. 
+1. Extract the logical operators in sequence from the given query string. 
   Note: Logical operators are "and, or, not"
 	    
-	 Input String : select season,winner,player_match from ipl.csv where season > 2014 and    		                 city ='Bangalore' or date > '31-12-2014'
+		Input String : select season,winner,player_match from ipl.csv where season > 2014 and city ='Bangalore' or date > '31-12-2014'
 	    Output String : 
 		               and
 		               or
 		        
-2)Extract the order by field from the given string.
+2. Extract the order by field from the given string.
   Note : The user may need the information in sorted order of a particular field.
         
-     Input String : select * from ipl.csv where season > 2016 and city='Bangalore' order by    					   win_by_runs
-	Output String : win_by_runs
- 
-dotnet test --filter "FullyQualifiedName~test.DbEngineTask3Test"
+     	Input String : select * from ipl.csv where season > 2016 and city= 'Bangalore' order by win_by_runs
+		Output String : win_by_runs
+
+
 ----------------------------------------------------------------------
 
-##Our task IV involves two steps, given below:    
-    
- 1)Extract the group by field from the given string.
-   Note : user may need the related information grouped together.
+#### Step-4 involves two tasks, given below:  
+
+1. Extract the group by fields from the given string.
+   Note : The user may need the related information grouped together.
    For Example they may require to see the information department wise.
         
-        Input String : select team1, city from ipl.csv where season > 2016 and 	                     city ='Bangalore' group by team1
+        Input String : select team1, city from ipl.csv where season > 2016 and city='Bangalore' group by team1
 		Output String : team1
 	
-2) User may require the information like who is getting maximum salary or minimum age etc.. these are called aggregate functions (minimum, maximum, count, average, sum)
-	Input String : select avg(win_by_wickets),min(win_by_runs) from ipl.csv 
-	Output String : 
-		            avg(win_by_wickets)
-                     min(win_by_runs)
+2. User may require the information like who is getting maximum salary or minimum age etc.. these are called aggregate functions (minimum, maximum, count, average, sum)
+	
+		Input String : select avg(win_by_wickets),min(win_by_runs) from ipl.csv 
+		Output String : 
+			            avg(win_by_wickets)
+            	        min(win_by_runs)
 	            
 	   	Note:  Other parts like where clause, order by, group by may be present in the query.
-	   	
-dotnet test --filter "FullyQualifiedName~test.DbEngineTask4Test"
+
+
 ------------------------------------------------------------------------------
+
+#### Building Solution based on TDD
+
+1. For all the above stated tasks, create a test class using xUnit testing framework in a test project
+
+2. Build the solution
+
+3. Test the solution using VS2019 in-built test explorer or dotnet cli command
+
+4. Refactor the code, till the time all the provided test cases do not pass
+
+5. At the end of all the methods implementation is done, run all test cases together.
+
+-------------------------------------------------------------------------------
+
+### Expected solution
+
+Displaying various **components/parts** of the query like **selected fields, conditional parts, aggregate fields, groupBy field, OrderBy field**
+
+#### Assignment Submission
+
+- Test the assignment locally, ensuring all the test cases pass
+- Push code to git
+- Submit the solution on [Hobbes](https://hobbes-ust.stackroute.in)
+
+---
+
+## Instructions
+
+- Avoid printing unnecessary values
+- Take care of whitespace/trailing whitespace
+- Do not change the provided class/method names unless instructed
+- Follow best practices while coding
+- We expect you to write the assignment on your own by following the guidelines, learning plan, and the practice exercises
+- The code must not be plagiarized, the mentors will randomly pick the submissions and may ask you to explain the solution
+- The code must be properly indented, code structure maintained as per the boilerplate and properly commented
+- Follow the problem statement shared with you
