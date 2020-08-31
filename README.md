@@ -177,34 +177,12 @@ At the end of all the methods Implementation is done run all test cases together
 
 Displaying various **components/parts** of the query like **selected fields, conditional parts, aggregate fields, groupBy field, OrderBy field**
 
-### Project structure
-
-The folders and files you see in this repositories, is how it is expected to be in projects, which are submitted for automated evaluation by Hobbes
-
-	Project
-	|
-	├── DbEngine	    // all your cs file will be stored in this namespace
-	|	└── QueryTransform.cs	            // This is the main file, all your logic is written in this file only
-	├── test // all your test cases will be stored in this namespace
-	|	└── DbEngineTask1Test.cs
-	|	└── DbEngineTask2Test.cs
-	|	└── DbEngineTask3Test.cs
-	|	└── DbEngineTask4Test.cs
-	|
-	├── DbEngine.sln        // This file is generated automatically while creating the project in Visual Studio
-	|
-	├── .hobbes   			        // Hobbes specific config options, such as type of evaluation schema, type of tech stack etc., Have saved  default values for convenience
-	|
-	|
-	└── PROBLEM.md  	           // This files describes the problem of the assignment/project, you can provide as much as information and clarification you want about the project in this file
-
-
 
 #### To use this as a boilerplate for your new project, you can follow these steps
 
 1. Clone the base boilerplate in the folder **assignment-solution-step1** of your local machine
      
-    `git clone https://gitlab-cts.stackroute.in/database_engine_dotnet/DataMungerStep1_Bolierplate.git` 
+    `git clone https://gitlab-ust.stackroute.in/database_engine_dotnet/DataMungerStep1_Bolierplate.git` 
 
 2. Navigate to assignment-solution-step1 folder
 
@@ -218,7 +196,7 @@ The folders and files you see in this repositories, is how it is expected to be 
 
 5. Add your new repository reference as remote
 
-     `git remote add origin https://gitlab-cts.stackroute.in/{{yourusername}}/assignment-solution-step1.git`
+     `git remote add origin https://gitlab-ust.stackroute.in/{{yourusername}}/assignment-solution-step1.git`
 
      **Note: {{yourusername}} should be replaced by your username from gitlab**
 
