@@ -1,4 +1,11 @@
-﻿#region Usings
+﻿/////////////////////////////////////////////////////////////
+// Created On: 2020-09-02
+// 20200902 | Initial commit Step1 task1 completion
+// 20200903 | Refractorings
+/////////////////////////////////////////////////////////////
+
+#region Usings
+using DataMunger.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +22,11 @@ namespace DataMunger
         /// Method to split queries into list of words in it
         /// </summary>
         /// <param name="queryString">input string</param>
-        /// <returns></returns>
+        /// <returns>List of words in query or null</returns>
         public static List<string> SplitQueryWords(string queryString)
         {
             List<string> queryResult;
-            if (String.IsNullOrEmpty(queryString))
+            if (string.IsNullOrEmpty(queryString))
             {
                 queryResult = null;
             }
@@ -36,23 +43,25 @@ namespace DataMunger
         /// Method to get the file name from input query
         /// </summary>
         /// <param name="queryString"></param>
-        /// <returns></returns>
+        /// <returns>File name or null</returns>
         public static string GetFileNameFromQuery(string queryString)
         {
-            return String.IsNullOrEmpty(queryString) ? null : queryString.Split(' ').FirstOrDefault(part => part.EndsWith(".csv"));
+            return string.IsNullOrEmpty(queryString) ? null :
+                queryString.Split(' ').FirstOrDefault(part => part.EndsWith(".csv"));
         }
         #endregion
 
         #region Base Part
+        /// <summary>
+        /// Method to get the base part of the wuery
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        /// <returns>Base part of string or null</returns>
         public static string GetBasePartFromQuery(string queryString)
         {
-            if (String.IsNullOrEmpty(queryString))
+            if(Common.IsValidQueryBasic(queryString))
             {
-                return null;
-            }
-            else
-            {
-                int index = queryString.IndexOf("where", StringComparison.InvariantCultureIgnoreCase);
+                int index = Common.GetStringIndex(queryString, "where");
                 if (index > -1)
                 {
                     if (queryString.Split(' ').ToList().IndexOf("where") < 3)
@@ -68,6 +77,10 @@ namespace DataMunger
                 {
                     return queryString.Trim();
                 }
+            }
+            else
+            {
+                return null;
             }
         }
         #endregion
