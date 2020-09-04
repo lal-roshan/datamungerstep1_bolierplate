@@ -2,13 +2,14 @@
 // Created On: 2020-09-02
 // 2020-09-02 | Initial Commit Part1 Step1 completed
 // 2020-09-03 | Part1 Step2 Completed
+// 2020-09-04 | Part1 step3 completed
 /////////////////////////////////////////////////////////////
 
 #region Usings
+using DataMunger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using DataMunger;
 #endregion
 
 #region Namespace
@@ -50,6 +51,12 @@ namespace datamungerstep1_Console
 
                 //Get conditions in filter part
                 //DisplaySplitResult(DataMungerStep2.GetConditionInFilter(queryString));
+
+                //Get logical operators in filter part
+                //DisplaySplitResult(DataMungerStep3.GetLogicalOperators(queryString));
+
+                //Get order by fields
+                DisplaySplitResult(DataMungerStep3.GetOrderField(queryString));
 
                 Console.WriteLine("\nPress any key to continue('esc' to stop)");
                 c = Console.ReadKey(); 

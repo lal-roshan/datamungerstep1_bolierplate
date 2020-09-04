@@ -1,13 +1,12 @@
 ﻿/////////////////////////////////////////////////////////////
 // Created On: 2020-09-02
 // 2020-09-03 | Initial Commit Part1 Step2 Completed
+// 2020-09-04 | Refractorings
 /////////////////////////////////////////////////////////////
 
 #region Usings
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using DataMunger.Utilities;
 #endregion
 
@@ -21,13 +20,6 @@ namespace DataMunger
     public class DataMungerStep2
     {
 
-        #region Constants
-        /// <summary>
-        /// String to display if there are no filters in query while getting filter
-        /// </summary>
-        const string noFilterString = "Query doesn't contain any filters";
-        #endregion
-
         #region Get Selected Fields
         /// <summary>
         /// Method to get selected fields forma input query
@@ -37,7 +29,7 @@ namespace DataMunger
         public static List<string> GetSelectedFields(string queryString)
         {
             List<string> queryResult = new List<string>();
-            if(Common.IsValidQueryBasic(queryString))
+            if (Common.IsValidQueryBasic(queryString))
             {
                 //Look whether the query starts with select and contains from
                 int selectIndex = Common.GetStringIndex(queryString, "select");
@@ -91,10 +83,12 @@ namespace DataMunger
         public static string GetFilterPart(string queryString)
         {
             string queryResult = "";
-            if(Common.IsValidQueryBasic(queryString))
+            if (Common.IsValidQueryBasic(queryString))
             {
                 // get index after four letters of where word (5 as index starts from 0)
                 int whereIndex = Common.GetStringIndex(queryString, "where", Common.Index.Last) + 5;
+
+                //a valid query will have a where clause minimum at 16th position.Eg: select * from t 
                 if (whereIndex > 15)
                 {
                     int endIndex = -1;
@@ -110,11 +104,11 @@ namespace DataMunger
                     {
                         endIndex = groupIndex;
                     }
-                    
+
                     //if the query contains both order by , group by clause and order by comes before group by
                     //and if order by is not part of any subquery in that case the query is wrong as 
                     // ORDER BY clause should be the last part of query
-                    if(orderIndex > -1 && groupIndex > -1 &&
+                    if (orderIndex > -1 && groupIndex > -1 &&
                         groupIndex > orderIndex && !queryString.Substring(orderIndex, groupIndex - orderIndex).Contains(")"))
                     {
                         queryResult = null;
@@ -128,10 +122,10 @@ namespace DataMunger
 
                         //if there is a bracket it means where keyword is inside a subquery and
                         //outer query only has order by which means there are no filters
-                        if ( queryString.Contains(")") ||
+                        if (queryString.Contains(")") ||
                             queryString.Length == 0)
                         {
-                            queryResult = noFilterString;
+                            queryResult = Common.NoFilterString;
                         }
                         else
                         {
@@ -153,7 +147,7 @@ namespace DataMunger
                     //if it has a subquery there must be more than one 'select' keyword or else it is wrong
                     else if (endIndex == -1 ||
                             Common.StringMatchCount(queryString.Substring(0, endIndex), "select") > 1)
-                    {                        
+                    {
                         queryResult = queryString.Substring(whereIndex);
                     }
                     //the query is wrong
@@ -167,7 +161,7 @@ namespace DataMunger
                 //and hence if it was -1 by adding 5 to it it becomes 4
                 else if (whereIndex == 4)
                 {
-                    queryResult = noFilterString;
+                    queryResult = Common.NoFilterString;
                 }
                 else
                 {
@@ -199,23 +193,19 @@ namespace DataMunger
                 return null;
             }
             //if there is no filter part in the query
-            else if(string.Equals(queryFilter, noFilterString))
+            else if (string.Equals(queryFilter, Common.NoFilterString))
             {
-                return new List<string> { noFilterString };
+                return new List<string> { Common.NoFilterString };
             }
             //find the conditions in filter part
             else
             {
-                string keywords = @"\b(and|or)\b";
-
                 //Split the filter part of the query with 'and' and 'or' keywords and
                 //remove those keywords from resultant list
-                return Regex.Split(queryFilter, keywords, RegexOptions.IgnoreCase).
-                       Where(x => !string.Equals(x.Trim(), "and", StringComparison.InvariantCultureIgnoreCase) &&
-                                  !string.Equals(x.Trim(), "or", StringComparison.InvariantCultureIgnoreCase)).
-                       Select(x => x.Trim()).ToList();
+                return Common.SplitByString(queryFilter, "and, or, not",
+                       Common.SplitType.RemoveThis);
             }
-        } 
+        }
         #endregion
     }
     #endregion
