@@ -84,7 +84,7 @@ namespace test
         }
         #endregion
 
-        #region Filter Part
+        #region Filter Part Condition
         /// <summary>
         /// Method to test getting filter part of query
         /// </summary>

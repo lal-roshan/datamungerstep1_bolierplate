@@ -3,6 +3,7 @@
 // 2020-09-03 | Initial commit Part1 Step2 Completed
 // 2020-09-04 | Functionalitites extended
 // 2020-09-05 | Functionalities improved Part1 all step completed
+// 2020-09-05 | Utility added for spliting conditions in query
 /////////////////////////////////////////////////////////////
 
 #region  Using
@@ -176,7 +177,7 @@ namespace DataMunger.Utilities
                         if (andIndex > -1)
                         {
                             int havingIndex = GetStringIndex(inBetween, "having");
-                            if ((havingIndex == -1) ||(andIndex < havingIndex &&
+                            if ((havingIndex == -1) || (andIndex < havingIndex &&
                                !isPartOfSubQuery(inBetween.Substring(andIndex, havingIndex - andIndex))))
                             {
                                 return false;
@@ -384,7 +385,7 @@ namespace DataMunger.Utilities
                 splitResult = Regex.Split(source, sb.ToString(), RegexOptions.IgnoreCase).ToList();
 
                 ///An empty item in list will only be present if there are spaces between keywords mentioned in substring
-                if(splitResult.Any(x => string.IsNullOrEmpty(x.Trim())))
+                if (splitResult.Any(x => string.IsNullOrEmpty(x.Trim())))
                 {
                     return null;
                 }
@@ -426,6 +427,46 @@ namespace DataMunger.Utilities
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Method to get the filter condition into three parts (fields, operator and value) if it is valid
+        /// </summary>
+        /// <param name="conditionString">The condition string</param>
+        /// <returns>Returns conition split into three parts or null</returns>
+        public static List<string> SplitConditionWords(string conditionString)
+        {
+            List<string> conditionParts = new List<string>();
+            if (string.IsNullOrEmpty(conditionString.Trim()))
+            {
+                conditionParts = null;
+            }
+            else
+            {
+                List<string> splitBySpace = conditionString.Split(' ').ToList();
+                ///If there isnt three parts in a condition i.e, field, operator and value
+                /// Then the query is invalid
+                if (splitBySpace.Count != 3)
+                {
+                    ///We need to ensure that if there are any valid conditions that are written without
+                    ///space between the three parts
+                    List<string> splitParts = Common.SplitByString(conditionString,
+                                        "=,<>,<,<=,>,>=", SplitType.DoNothing , true);
+                    if (splitParts == null || splitParts.Count != 3)
+                    {
+                        conditionParts = null;
+                    }
+                    else
+                    {
+                        conditionParts.AddRange(splitParts);
+                    }
+                }
+                else
+                {
+                    conditionParts.AddRange(splitBySpace);
+                }
+            }
+            return conditionParts;
         }
         #endregion
     }

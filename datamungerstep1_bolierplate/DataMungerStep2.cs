@@ -3,6 +3,7 @@
 // 2020-09-03 | Initial Commit Part1 Step2 Completed
 // 2020-09-04 | Refractorings
 // 2020-09-05 | Functionalities improved Part1 all step completed
+// 2020-09-05 | Conditions part further modified
 /////////////////////////////////////////////////////////////
 
 #region Usings
@@ -186,27 +187,37 @@ namespace DataMunger
         /// <returns></returns>
         public static List<string> GetConditionInFilter(string queryString)
         {
+            List<string> queryResult = new List<string>();
+
             ///Get the filter part of the query
             string queryFilter = GetFilterPart(queryString);
 
             ///if the query is not valid
             if (string.IsNullOrEmpty(queryFilter))
             {
-                return null;
+                queryResult = null;
             }
             ///if there is no filter part in the query
             else if (string.Equals(queryFilter, Common.NoFilterString))
             {
-                return new List<string> { Common.NoFilterString };
+                queryResult.Add(Common.NoFilterString);
             }
             ///find the conditions in filter part
             else
             {
                 ///Split the filter part of the query with 'and' and 'or' keywords and
                 ///remove those keywords from resultant list
-                return Common.SplitByString(queryFilter, "and, or, not",
-                       Common.SplitType.RemoveThis);
+                queryResult = Common.SplitByString(queryFilter, "and, or, not",
+                              Common.SplitType.RemoveThis);
+
+                ///checking whether the conditions in filter part are valid
+                if (queryResult != null &&
+                    queryResult.Any(x => Common.SplitConditionWords(x) == null))
+                {
+                    queryResult = null;
+                }
             }
+            return queryResult;
         }
         #endregion
     }
