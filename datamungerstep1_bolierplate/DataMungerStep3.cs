@@ -57,7 +57,9 @@ namespace DataMunger
             }
             return queryResult;
         }
+        #endregion
 
+        #region Order Field
         /// <summary>
         /// Method to get fields used in order clause
         /// </summary>

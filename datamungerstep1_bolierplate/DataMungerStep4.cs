@@ -20,6 +20,7 @@ namespace DataMunger
     /// </summary>
     public class DataMungerStep4
     {
+        #region Group field
         /// <summary>
         /// Method to get group by fields from a query
         /// </summary>
@@ -103,7 +104,9 @@ namespace DataMunger
             }
             return queryResult;
         }
+        #endregion
 
+        #region Aggregate functions
         /// <summary>
         /// Method to get the aggregate functions from query
         /// </summary>
@@ -148,7 +151,8 @@ namespace DataMunger
                 queryResult = null;
             }
             return queryResult;
-        }
+        } 
+        #endregion
     }
     #endregion
 }
