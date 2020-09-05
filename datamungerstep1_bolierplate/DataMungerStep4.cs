@@ -53,7 +53,7 @@ namespace DataMunger
                         {
                             ///If last part contains where and ')' it means the only group by in the string is
                             ///a part of substring and hence no group by in base query
-                            if (Common.isPartOfSubQuery(queryResult.Last()))
+                            if (Common.IsPartOfSubQuery(queryResult.Last()))
                             {
                                 queryResult.Clear();
                                 queryResult.Add(Common.NoBaseGroupByClause);
@@ -65,7 +65,7 @@ namespace DataMunger
                             }
                         }
                         ///Checks whether the lsat part contains a ')' but no '(', implying that the group by is in a substring
-                        else if (Common.isPartOfSubQuery(queryResult.Last()) &&
+                        else if (Common.IsPartOfSubQuery(queryResult.Last()) &&
                                 !queryResult.Last().Contains('('))
                         {
                             queryResult.Clear();

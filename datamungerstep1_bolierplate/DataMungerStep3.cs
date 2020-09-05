@@ -90,7 +90,7 @@ namespace DataMunger
                         if (Common.StringMatchCount(queryResult.Last(), "where") > 0 ||
                             Common.StringMatchCount(queryResult.Last(), "group by") > 0)
                         {
-                            if (Common.isPartOfSubQuery(queryResult.Last()))
+                            if (Common.IsPartOfSubQuery(queryResult.Last()))
                             {
                                 queryResult.Clear();
                                 queryResult.Add(Common.NoBaseOrderByClause);
@@ -101,7 +101,7 @@ namespace DataMunger
                             }
                         }
                         ///if last part is part of subquery
-                        else if (Common.isPartOfSubQuery(queryResult.Last()) &&
+                        else if (Common.IsPartOfSubQuery(queryResult.Last()) &&
                                 !queryResult.Last().Contains('('))
                         {
                             queryResult.Clear();

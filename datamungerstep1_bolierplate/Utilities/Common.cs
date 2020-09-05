@@ -162,7 +162,7 @@ namespace DataMunger.Utilities
                     {
                         inBetween = queryString.Substring(orderByIndexes[index],
                                     groupByIndexes[index] - orderByIndexes[index]);
-                        if (!isPartOfSubQuery(inBetween))
+                        if (!IsPartOfSubQuery(inBetween))
                         {
                             return false;
                         }
@@ -178,7 +178,7 @@ namespace DataMunger.Utilities
                         {
                             int havingIndex = GetStringIndex(inBetween, "having");
                             if ((havingIndex == -1) || (andIndex < havingIndex &&
-                               !isPartOfSubQuery(inBetween.Substring(andIndex, havingIndex - andIndex))))
+                               !IsPartOfSubQuery(inBetween.Substring(andIndex, havingIndex - andIndex))))
                             {
                                 return false;
                             }
@@ -420,7 +420,7 @@ namespace DataMunger.Utilities
         /// </summary>
         /// <param name="queryString">part of query</param>
         /// <returns></returns>
-        public static bool isPartOfSubQuery(string queryString)
+        public static bool IsPartOfSubQuery(string queryString)
         {
             if (queryString.Contains(')'))
             {
