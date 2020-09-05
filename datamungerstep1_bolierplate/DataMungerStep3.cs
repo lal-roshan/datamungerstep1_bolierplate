@@ -1,6 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////
 // Created On: 2020-09-03
 // 2020-09-04 | Initial commit part1 step 3 completed
+// 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
 #region Using
@@ -41,9 +42,10 @@ namespace DataMunger
                 }
                 else
                 {
+                    ///Splits the filter part based on operators and removes all other part
                     queryResult = Common.SplitByString(filterPart, "and, or, not",
                                   Common.SplitType.RemoveAllButThis);
-                    if (queryResult.Count == 0)
+                    if (queryResult != null && queryResult.Count == 0)
                     {
                         queryResult.Add(Common.NoLogicalOperatorsString);
                     }
@@ -68,20 +70,25 @@ namespace DataMunger
             if (Common.IsValidQueryBasic(queryString))
             {
                 queryResult = Common.SplitByString(queryString, "order by");
-                if (queryResult.Count == 1)
+                ///split result with count 1 means there was nt order by clause in the query
+                if (queryResult?.Count == 1)
                 {
                     queryResult.Clear();
                     queryResult.Add(Common.NoOrderByClause);
                 }
-                else if (queryResult.Count > 2)
+                else if (queryResult?.Count > 2)
                 {
+                    ///Check whether second last part is order by, if yes then last part will be the order by field
+                    ///for valid queries
                     if (string.Equals(queryResult[queryResult.Count - 2], "order by",
                         StringComparison.InvariantCultureIgnoreCase))
                     {
+                        ///if the part after order by contains where or group by and if they are not
+                        ///in substring , then query is invalid
                         if (Common.StringMatchCount(queryResult.Last(), "where") > 0 ||
                             Common.StringMatchCount(queryResult.Last(), "group by") > 0)
                         {
-                            if (queryResult.Last().Contains(')'))
+                            if (Common.isPartOfSubQuery(queryResult.Last()))
                             {
                                 queryResult.Clear();
                                 queryResult.Add(Common.NoBaseOrderByClause);
@@ -91,17 +98,20 @@ namespace DataMunger
                                 queryResult = null;
                             }
                         }
-                        else if (queryResult.Last().Contains(')') &&
+                        ///if last part is part of subquery
+                        else if (Common.isPartOfSubQuery(queryResult.Last()) &&
                                 !queryResult.Last().Contains('('))
                         {
                             queryResult.Clear();
                             queryResult.Add(Common.NoBaseOrderByClause);
                         }
+                        ///else the last part will be the order by field
                         else
                         {
                             queryResult = queryResult.Last().Split(',').Select(x => x.Trim()).ToList();
                         }
                     }
+                    ///If second last part of query is not order by it won't be in base query
                     else
                     {
                         queryResult.Clear();

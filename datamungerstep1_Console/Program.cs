@@ -3,6 +3,7 @@
 // 2020-09-02 | Initial Commit Part1 Step1 completed
 // 2020-09-03 | Part1 Step2 Completed
 // 2020-09-04 | Part1 step3 completed
+// 2020-09-05 | Part1 all step completed
 /////////////////////////////////////////////////////////////
 
 #region Usings
@@ -29,34 +30,95 @@ namespace datamungerstep1_Console
             {
                 Console.Clear();
                 string queryString = "";
-                Console.Write("Input string: ");
-                queryString = Console.ReadLine();
+                int operation = 0;
 
                 Console.WriteLine();
 
-                //Split the querseley into words
-                //DisplaySplitResult(DataMungerStep1.SplitQueryWords(queryString));
+                Console.WriteLine("Choose operation: ");
+                Console.WriteLine("1. Split query");
+                Console.WriteLine("2. Get file name");
+                Console.WriteLine("3. Get base part");
+                Console.WriteLine("4. Get selected fields");
+                Console.WriteLine("5. Get filter part");
+                Console.WriteLine("6. Get condition in filter part");
+                Console.WriteLine("7. Get logical operators in filter part");
+                Console.WriteLine("8. Get order by field");
+                Console.WriteLine("9. Get group by field");
+                Console.WriteLine("10. Get aggegate functions");
+                Console.WriteLine();
+                Console.WriteLine("-> ");
 
-                //Get filename from query
-                //DisplayResult(DataMungerStep1.GetFileNameFromQuery(queryString));
+                try
+                {
+                    operation = Convert.ToInt32(Console.ReadLine());
+                }
+                catch (Exception ex)
+                {
+                    operation = 0;
+                }
 
-                //Get base part of query
-                //DisplayResult(DataMungerStep1.GetBasePartFromQuery(queryString));
+                Console.WriteLine();
+                Console.Write("Enter Input string: ");
+                Console.WriteLine();
+                queryString = Console.ReadLine();
+                Console.WriteLine();
 
-                //Get selected fields fo query
-                //DisplaySplitResult(DataMungerStep2.GetSelectedFields(queryString));
+                switch (operation)
+                {
+                    case 1:
+                        //Split the querseley into words
+                        DisplaySplitResult(DataMungerStep1.SplitQueryWords(queryString));
+                        break;
 
-                //Get filter part
-                //DisplayResult(DataMungerStep2.GetFilterPart(queryString));
+                    case 2:
+                        //Get filename from query
+                        DisplayResult(DataMungerStep1.GetFileNameFromQuery(queryString));
+                        break;
 
-                //Get conditions in filter part
-                //DisplaySplitResult(DataMungerStep2.GetConditionInFilter(queryString));
+                    case 3:
+                        //Get base part of query
+                        DisplayResult(DataMungerStep1.GetBasePartFromQuery(queryString));
+                        break;
 
-                //Get logical operators in filter part
-                //DisplaySplitResult(DataMungerStep3.GetLogicalOperators(queryString));
+                    case 4:
+                        //Get selected fields fo query
+                        DisplaySplitResult(DataMungerStep2.GetSelectedFields(queryString));
+                        break;
 
-                //Get order by fields
-                DisplaySplitResult(DataMungerStep3.GetOrderField(queryString));
+                    case 5:
+                        //Get filter part
+                        DisplayResult(DataMungerStep2.GetFilterPart(queryString));
+                        break;
+
+                    case 6:
+                        //Get conditions in filter part
+                        DisplaySplitResult(DataMungerStep2.GetConditionInFilter(queryString));
+                        break;
+
+                    case 7:
+                        //Get logical operators in filter part
+                        DisplaySplitResult(DataMungerStep3.GetLogicalOperators(queryString));
+                        break;
+
+                    case 8:
+                        //Get order by fields
+                        DisplaySplitResult(DataMungerStep3.GetOrderField(queryString));
+                        break;
+
+                    case 9:
+                        //Get group by fields
+                        DisplaySplitResult(DataMungerStep4.GetGroupByField(queryString));
+                        break;
+
+                    case 10:
+                        //Get aggregate functions
+                        DisplaySplitResult(DataMungerStep4.GetAggregateFunctions(queryString));
+                        break;
+
+                    default:
+                        Console.WriteLine("Not a valid operation!!!");
+                        break;
+                }
 
                 Console.WriteLine("\nPress any key to continue('esc' to stop)");
                 c = Console.ReadKey(); 

@@ -2,6 +2,7 @@
 // Created On: 2020-09-03
 // 2020-09-03 | Initial commit Part1 Step2 Completed
 // 2020-09-04 | Functionalitites extended
+// 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
 #region  Using
@@ -22,6 +23,12 @@ namespace DataMunger.Utilities
     public class Common
     {
         #region Constants
+
+        /// <summary>
+        /// Message to display if there is no file name in query
+        /// </summary>
+        public const string NoFileName = "Query doesn't contain any file name";
+
         /// <summary>
         /// String to display if there are no filters in query while getting filter
         /// </summary>
@@ -38,9 +45,24 @@ namespace DataMunger.Utilities
         public const string NoOrderByClause = "Query doesn't contain order by clause";
 
         /// <summary>
+        /// Message to be displayed when there is no group by clause in the query
+        /// </summary>
+        public const string NoGroupByClause = "Query doesn't contain group by clause";
+
+        /// <summary>
         /// Message to be displayed when there is no order by clause in the base query
         /// </summary>
         public const string NoBaseOrderByClause = "Base query doesn't contain order by clause";
+
+        /// <summary>
+        /// Message to be displayed when there is no group by clause in the base query
+        /// </summary>
+        public const string NoBaseGroupByClause = "Base query doesn't contain group by clause";
+
+        /// <summary>
+        /// Message to be displayed when there are no aggregate functions in the base query
+        /// </summary>
+        public const string NoAggregateFunctions = "Base query doesn't contain any aggregate functions";
         #endregion
 
         #region Enums
@@ -68,7 +90,108 @@ namespace DataMunger.Utilities
         }
         #endregion
 
-        #region Methods
+        #region Private Methods
+
+        /// <summary>
+        /// Method to check whether all the where conditions are at valid positions
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        /// <returns>true or false based on query validity</returns>
+        private static bool AreWherePositionsValid(string queryString)
+        {
+            ///Get all indexes of where keyword in string
+            List<int> whereIndexes = GetStringIndexes(queryString, "where");
+            if (whereIndexes.Count > 0)
+            {
+                ///Get all indexes of from keyword in string
+                List<int> fromIndexes = GetStringIndexes(queryString, "from");
+
+                ///In a valid query the number of where keyword should be equal to number of from keyword
+                if (fromIndexes.Count == whereIndexes.Count)
+                {
+                    int index = 0;
+                    while (index < fromIndexes.Count)
+                    {
+                        ///if where keyword comes between from keyword or if there are not even a single
+                        ///character between from and where, the query is invalid
+                        if ((whereIndexes[index] < fromIndexes[index]) ||
+                            (whereIndexes[index] - fromIndexes[index] < 7))
+                        {
+                            return false;
+                        }
+                        index++;
+                    }
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Method to check whether order by and group by clauses are at valid positions
+        /// </summary>
+        /// <param name="queryString">Input query</param>
+        /// <returns>true or false based on query validity</returns>
+        private static bool AreOrderGroupPositionsValid(string queryString)
+        {
+            ///Get all the indexes of orderby  clause
+            List<int> orderByIndexes = GetStringIndexes(queryString, "order by");
+            ///Get all the indexes of groupby clause
+            List<int> groupByIndexes = GetStringIndexes(queryString, "group by");
+
+            /// if there are atleast one orderby and one groupby clause we have to check their position validity
+            if (orderByIndexes.Count > 0 && groupByIndexes.Count > 0)
+            {
+                ///Get the lesser count value as we have to only ensure that each group by comes before each order by
+                ///So if there are 3 order by and 2 group by, we only have to check whether
+                ///the 2 group by comes before 2 order by
+                int maxIndex = groupByIndexes.Count < orderByIndexes.Count ? groupByIndexes.Count :
+                            orderByIndexes.Count;
+                int index = 0;
+                while (index < maxIndex)
+                {
+                    string inBetween = "";
+                    /// All group by should be before order by, if not the group by should be a part of a substring, 
+                    /// which is ensure by checkin whether ther is a ')' between group by and order by
+                    if (orderByIndexes[index] < groupByIndexes[index])
+                    {
+                        inBetween = queryString.Substring(orderByIndexes[index],
+                                    groupByIndexes[index] - orderByIndexes[index]);
+                        if (!isPartOfSubQuery(inBetween))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        ///If order by comes after group by ensure that there are no and keyword in between unless it
+                        ///is in having clause
+                        inBetween = queryString.Substring(groupByIndexes[index],
+                                    orderByIndexes[index] - groupByIndexes[index]);
+                        int andIndex = GetStringIndex(inBetween, "and");
+                        if (andIndex > -1)
+                        {
+                            int havingIndex = GetStringIndex(inBetween, "having");
+                            if ((havingIndex == -1) ||(andIndex < havingIndex &&
+                               !isPartOfSubQuery(inBetween.Substring(andIndex, havingIndex - andIndex))))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    index++;
+                }
+                return true;
+            }
+            return true;
+        }
+        #endregion
+
+        #region Public Methods
         /// <summary>
         /// Method to do a basic checking whether or not a query is valid
         /// </summary>
@@ -76,8 +199,8 @@ namespace DataMunger.Utilities
         /// <returns></returns>true or false
         public static bool IsValidQueryBasic(string queryString)
         {
-            // valid query will have atleast 16 characters before where Eg: select * from t
-            //(taking 15 as it is 0 based index)
+            ///valid query will have atleast 16 characters before where Eg: select * from t
+            ///(taking 15 as it is 0 based index)
             if (string.IsNullOrEmpty(queryString) || queryString.Length < 15)
             {
                 return false;
@@ -86,27 +209,30 @@ namespace DataMunger.Utilities
             {
                 int selectIndex = GetStringIndex(queryString, "select");
                 int fromIndex = GetStringIndex(queryString, "from");
-                int whereIndex = GetStringIndex(queryString, "where");
-                //Checks wether there is a select and from clause and whether there is atleast a character
-                //between them (selectIndex + 6 is for 5 letters of select plus one for whitespace)
+
+                ///Checks wether there is a select and from clause and whether there is atleast a character
+                ///between them (selectIndex + 6 is for 5 letters of select plus one for whitespace)
                 if (selectIndex == -1 || fromIndex == -1 || selectIndex + 7 == fromIndex)
                 {
                     return false;
                 }
+
+                ///Calculating the count of each main keywords in string
                 int selectCount = StringMatchCount(queryString, "select");
                 int fromCount = StringMatchCount(queryString, "from");
                 int whereCount = StringMatchCount(queryString, "where");
                 int orderByCount = StringMatchCount(queryString, "order by");
                 int groupByCount = StringMatchCount(queryString, "group by");
 
-                //if a query is valid there should be equal number of select and from clause
-                //similarly if a query has where , order by or group clauses there count 
-                //cannot be greater thaan the select clause
+                ///if a query is valid there should be equal number of select and from keyword
+                ///similarly if a query has where , order by or group clauses there count 
+                ///cannot be greater than the select clause
                 if (selectCount != fromCount ||
                    (whereCount > 0 && whereCount > selectCount) ||
                    (orderByCount > 0 && orderByCount > selectCount) ||
                    (groupByCount > 0 && groupByCount > selectCount) ||
-                   (whereIndex < fromIndex && whereCount == fromCount))
+                   (!AreWherePositionsValid(queryString)) ||
+                   (!AreOrderGroupPositionsValid(queryString)))
                 {
                     return false;
                 }
@@ -124,10 +250,12 @@ namespace DataMunger.Utilities
         public static int GetStringIndex(string source, string pattern, Index type = Index.First)
         {
             int index = -1;
+            ///If source string is null
             if (string.IsNullOrEmpty(source))
             {
                 return -1;
             }
+            ///Else find the substring index based on type: first or last
             switch (type)
             {
                 case Index.First:
@@ -141,21 +269,57 @@ namespace DataMunger.Utilities
         }
 
         /// <summary>
+        /// Method to find all indexes of pattern occurence in source string
+        /// </summary>
+        /// <param name="source">Source string</param>
+        /// <param name="pattern">substring to be checked</param>
+        /// <returns>List of all indexes</returns>
+        public static List<int> GetStringIndexes(string source, string pattern)
+        {
+            List<int> indexes = new List<int>();
+            int index = GetStringIndex(source, pattern);
+            while (index > 0)
+            {
+                indexes.Add(index);
+                index = GetStringIndex(source.Substring(index, source.Length - index), pattern);
+            }
+            return indexes;
+        }
+
+        /// <summary>
         /// Method to get the count of matched substring in source string
         /// </summary>
         /// <param name="source">Source string</param>
         /// <param name="pattern">substring to be checked</param>
         /// <returns>Number of matches of substring found in source</returns>
-        public static int StringMatchCount(string source, string pattern)
+        /// <param name="isRegex">Reperesents whether the pattern is a regex pattern</param>
+        public static int StringMatchCount(string source, string pattern, bool isRegex = false)
         {
             int count;
             if (string.IsNullOrEmpty(source))
             {
                 count = 0;
             }
-            else 
+            else
             {
-                count = Regex.Matches(source, "\\b(" + pattern + ")\\b", RegexOptions.IgnoreCase).Count;
+                StringBuilder sb = new StringBuilder();
+                sb.Append(pattern);
+
+                ///If the pattern is a regex pattern having a \b at ends doesn't result in a match
+                ///whereas it is required for normal patterns as whole word should be matched.
+                ///That is, if we are checking 'or' in 'Banglore', without \b it would return true which is not expected
+                if (isRegex)
+                {
+                    sb.Insert(0, "(");
+                    sb.Append(")");
+                }
+                else
+                {
+                    sb.Insert(0, "\\b(");
+                    sb.Append(")\\b");
+                }
+
+                count = Regex.Matches(source, sb.ToString(), RegexOptions.IgnoreCase).Count;
             }
             return count;
         }
@@ -167,7 +331,7 @@ namespace DataMunger.Utilities
         /// <param name="substring">part to be replaced</param>
         /// <param name="substitute">part to be added (Default is empty string)</param>
         /// <returns>new string with replaced substring</returns>
-        public static string StringReplace(string source,string substring, string substitute ="")
+        public static string StringReplace(string source, string substring, string substitute = "")
         {
             return Regex.Replace(source, substring, substitute, RegexOptions.IgnoreCase);
         }
@@ -179,44 +343,68 @@ namespace DataMunger.Utilities
         /// <param name="substrings">coma seperated substrings at which source has to be split
         /// (If no string is provided the source will be split by space and split type will be ignored)</param>
         /// <param name="type">Type of operation that should be performed on the returned collection</param>
+        /// <param name="isRegex">Denotes whether the substring provided is a regex pattern</param>
         /// <returns>Collection of split words</returns>
         public static List<string> SplitByString(string source, string substrings,
-            SplitType type = SplitType.DoNothing)
+            SplitType type = SplitType.DoNothing, bool isRegex = false)
         {
             List<string> splitResult = new List<string>();
 
-            //If no substrings are provided then split the source by whitespace
+            ///If no substrings are provided then split the source by whitespace
             if (string.IsNullOrEmpty(substrings))
             {
                 splitResult = source.Split(' ').ToList();
             }
             else
             {
-                //Creating a regex filter with all substrings
+                ///Creating a regex filter with all substrings
                 StringBuilder sb = new StringBuilder();
-                sb.Append("\\b(");
-                foreach(string substring in substrings.Split(','))
+                foreach (string substring in substrings.Split(','))
                 {
                     sb.Append(substring.Trim() + "|");
                 }
                 sb.Remove(sb.Length - 1, 1);
-                sb.Append(")\\b");
-               
-                //Split the souce based on substrings provided
+
+                ///If the substring is a regex pattern having a \b at ends doesn't result in a match
+                ///whereas it is required for normal patterns as whole word should be matched.
+                ///That is, if we are spliting with 'or' in 'Banglore',
+                ///without \b it would return 'Bangl', 'e' which is not expected
+                if (isRegex)
+                {
+                    sb.Insert(0, "(");
+                    sb.Append(")");
+                }
+                else
+                {
+                    sb.Insert(0, "\\b(");
+                    sb.Append(")\\b");
+                }
+
+                ///Split the souce based on substrings provided
                 splitResult = Regex.Split(source, sb.ToString(), RegexOptions.IgnoreCase).ToList();
 
-                //Decide whether to remove the substrings from source or keep substrings
-                if(splitResult.Count > 0)
+                ///An empty item in list will only be present if there are spaces between keywords mentioned in substring
+                if(splitResult.Any(x => string.IsNullOrEmpty(x.Trim())))
+                {
+                    return null;
+                }
+
+                ///Decide whether to remove the substrings from source or keep substrings
+                if (splitResult.Count > 0)
                 {
                     switch (type)
                     {
+                        ///If ANY of the substrings gets matched with the item in splitresult it gets added to the result
                         case SplitType.RemoveAllButThis:
-                            splitResult = splitResult.Where(x => StringMatchCount(substrings, x) > 0).
+                            splitResult = splitResult.Where(x => substrings.Split(',')
+                            .Any(part => StringMatchCount(x, part.Trim(), isRegex) > 0)).
                             Select(x => x.Trim()).ToList();
                             break;
 
+                        ///If ALL of the substrings doesnt match with the item in splitresult it gets added to the result
                         case SplitType.RemoveThis:
-                            splitResult = splitResult.Where(x => StringMatchCount(substrings, x) == 0).
+                            splitResult = splitResult.Where(x => substrings.Split(',')
+                            .All(part => StringMatchCount(x, part.Trim(), isRegex) == 0)).
                             Select(x => x.Trim()).ToList();
                             break;
                     }
@@ -224,6 +412,20 @@ namespace DataMunger.Utilities
             }
 
             return splitResult;
+        }
+
+        /// <summary>
+        /// Method to check whether the string is a part of sub query
+        /// </summary>
+        /// <param name="queryString">part of query</param>
+        /// <returns></returns>
+        public static bool isPartOfSubQuery(string queryString)
+        {
+            if (queryString.Contains(')'))
+            {
+                return true;
+            }
+            return false;
         }
         #endregion
     }
