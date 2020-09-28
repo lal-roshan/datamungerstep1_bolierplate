@@ -6,18 +6,14 @@
 // 2020-09-05 | Utility added for spliting conditions in query
 /////////////////////////////////////////////////////////////
 
-#region  Using
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-#endregion
 
-#region Namespace
 namespace DataMunger.Utilities
 {
-    #region Class
     /// <summary>
     /// Class containing utility functions
     /// </summary>
@@ -451,7 +447,7 @@ namespace DataMunger.Utilities
                     ///We need to ensure that if there are any valid conditions that are written without
                     ///space between the three parts
                     List<string> splitParts = Common.SplitByString(conditionString,
-                                        "=,<>,<,<=,>,>=", SplitType.DoNothing , true);
+                                        "=,!=,<,<=,>,>=", SplitType.DoNothing , true);
                     if (splitParts == null || splitParts.Count != 3)
                     {
                         conditionParts = null;
@@ -470,7 +466,4 @@ namespace DataMunger.Utilities
         }
         #endregion
     }
-    #endregion
 }
-
-#endregion

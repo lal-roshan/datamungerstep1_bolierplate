@@ -3,22 +3,18 @@
 // 2020-09-05 | Part1 all step completed
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using DataMunger.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-#endregion
 
-#region Namespace
 namespace DataMunger
 {
-    #region  Class
     /// <summary>
     /// Classs containing methods for step 4
     /// </summary>
-    public class DataMungerStep4
+    public class GroupAndAggregateFields
     {
         #region Group field
         /// <summary>
@@ -118,7 +114,7 @@ namespace DataMunger
             if (Common.IsValidQueryBasic(queryString))
             {
                 ///Get the base part of query as the aggregate functions on selected fields are to be found
-                string basePart = DataMungerStep1.GetBasePartFromQuery(queryString);
+                string basePart = BasicQueryOperations.GetBasePartFromQuery(queryString);
                 if (!string.IsNullOrEmpty(basePart))
                 {
                     ///Create coma seperated pattern string for each aggregate function
@@ -154,6 +150,4 @@ namespace DataMunger
         } 
         #endregion
     }
-    #endregion
 }
-#endregion

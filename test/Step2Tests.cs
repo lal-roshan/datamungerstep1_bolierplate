@@ -33,7 +33,7 @@ namespace test
             string queryString = "SELECT col1 = (select * from ipl.csv) From ipl.csv";
             List<string> queryResult = new List<string> { "col1 = (select * from ipl.csv)" };
 
-            Assert.Equal(queryResult, DataMungerStep2.GetSelectedFields(queryString));
+            Assert.Equal(queryResult, QueryPartsOperations.GetSelectedFields(queryString));
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace test
         [InlineData("")]
         public void InvalidQuerySelectedFieldsTests(string queryString)
         {
-            Assert.Null(DataMungerStep2.GetSelectedFields(queryString));
+            Assert.Null(QueryPartsOperations.GetSelectedFields(queryString));
         }
         #endregion
 
@@ -65,7 +65,7 @@ namespace test
             //result 1: "season > 2014 or city = 'Bangalore'"
             string queryString = "Select city1 from city where city = 'Banglore' group by city order by city";
             string queryResult = "city = 'Banglore'";
-            Assert.Equal(queryResult, DataMungerStep2.GetFilterPart(queryString));
+            Assert.Equal(queryResult, QueryPartsOperations.GetFilterPart(queryString));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace test
         [InlineData("")]
         public void InvalidQueryFilterPartTest(string queryString)
         {
-            Assert.Null(DataMungerStep2.GetFilterPart(queryString));
+            Assert.Null(QueryPartsOperations.GetFilterPart(queryString));
         }
         #endregion
 
@@ -93,7 +93,7 @@ namespace test
         {
             string queryString = "select * from ipl.csv where season > 2014 and city = 'Bangalore'";
             List<string> queryResult = new List<string> { "season > 2014", "city = 'Bangalore'" };
-            Assert.Equal(queryResult, DataMungerStep2.GetConditionInFilter(queryString));
+            Assert.Equal(queryResult, QueryPartsOperations.GetConditionInFilter(queryString));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace test
         [InlineData("")]
         public void InvalidQueryConditionFilterPartTest(string queryString)
         {
-            Assert.Null(DataMungerStep2.GetConditionInFilter(queryString));
+            Assert.Null(QueryPartsOperations.GetConditionInFilter(queryString));
         } 
         #endregion
 

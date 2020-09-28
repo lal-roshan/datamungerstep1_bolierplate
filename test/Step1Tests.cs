@@ -28,7 +28,7 @@ namespace test
             string queryString = "select * from ipl.csv where season > 2014 and city = 'Bangalore'";
             List<string> queryResult = new List<string>{"select", "*", "from", "ipl.csv", "where", "season", ">", "2014",
                                     "and", "city", "=", "'Bangalore'"};
-            Assert.Equal(queryResult, DataMungerStep1.SplitQueryWords(queryString));
+            Assert.Equal(queryResult, BasicQueryOperations.SplitQueryWords(queryString));
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace test
         [InlineData("")]
         public void SplitWordsQueryEmptyTest(string queryString)
         {
-            Assert.Null(DataMungerStep1.SplitQueryWords(queryString));
+            Assert.Null(BasicQueryOperations.SplitQueryWords(queryString));
         }
         #endregion
 
@@ -53,7 +53,7 @@ namespace test
         {
             string queryString = "select * from ipl.csv where season > 2014 and city = 'Bangalore'";
             string fileName = "ipl.csv";
-            Assert.Equal(fileName, DataMungerStep1.GetFileNameFromQuery(queryString));
+            Assert.Equal(fileName, BasicQueryOperations.GetFileNameFromQuery(queryString));
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace test
         [InlineData("")]
         public void QueryEmptyTest(string queryString)
         {
-            Assert.Null(DataMungerStep1.GetFileNameFromQuery(queryString));
+            Assert.Null(BasicQueryOperations.GetFileNameFromQuery(queryString));
         }
         #endregion
 
@@ -78,7 +78,7 @@ namespace test
         {
             string queryString = "select * from ipl.csv where season > 2014 and city = 'Bangalore'";
             string fileName = "select * from ipl.csv";
-            Assert.Equal(fileName, DataMungerStep1.GetBasePartFromQuery(queryString));
+            Assert.Equal(fileName, BasicQueryOperations.GetBasePartFromQuery(queryString));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace test
         [InlineData("")]
         public void QueryEmptyTestBase(string queryString)
         {
-            Assert.Null(DataMungerStep1.GetBasePartFromQuery(queryString));
+            Assert.Null(BasicQueryOperations.GetBasePartFromQuery(queryString));
         }
         #endregion
     }

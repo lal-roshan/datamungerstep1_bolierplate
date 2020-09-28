@@ -27,7 +27,7 @@ namespace test
         {
             string queryString = "select * from table1 where id =1 group by id, name order by name";
             List<string> queryResult = new List<string> { "id", "name" };
-            Assert.Equal(queryResult, DataMungerStep4.GetGroupByField(queryString));
+            Assert.Equal(queryResult, GroupAndAggregateFields.GetGroupByField(queryString));
         }
 
         [Theory]
@@ -38,7 +38,7 @@ namespace test
         [InlineData(null)]
         public void InvalidQueryGroupByFieldTest(string queryString)
         {
-            Assert.Null(DataMungerStep4.GetGroupByField(queryString));
+            Assert.Null(GroupAndAggregateFields.GetGroupByField(queryString));
         }
         #endregion
 
@@ -51,7 +51,7 @@ namespace test
         {
             string queryString = "select avg(win_by_wickets),min(win_by_runs), sum(score) from ipl.csv";
             List<string> queryResult = new List<string> { "avg(win_by_wickets)", "min(win_by_runs)", "sum(score)" };
-            Assert.Equal(queryResult, DataMungerStep4.GetAggregateFunctions(queryString));
+            Assert.Equal(queryResult, GroupAndAggregateFields.GetAggregateFunctions(queryString));
         }
 
         [Theory]
@@ -63,7 +63,7 @@ namespace test
         [InlineData(null)]
         public void InvalidQueryAggregateFunctionTest(string queryString)
         {
-            Assert.Null(DataMungerStep4.GetAggregateFunctions(queryString));
+            Assert.Null(GroupAndAggregateFields.GetAggregateFunctions(queryString));
         }
         #endregion
     } 

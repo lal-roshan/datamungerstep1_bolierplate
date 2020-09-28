@@ -4,21 +4,17 @@
 // 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
-#region Using
 using DataMunger.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#endregion
 
-#region Namespace
 namespace DataMunger
 {
-    #region Class
     /// <summary>
     /// Class containing step 3 of part 1
     /// </summary>
-    public class DataMungerStep3
+    public class LogicalAndOrderFields
     {
         #region Logical Operators
         /// <summary>
@@ -31,7 +27,7 @@ namespace DataMunger
             List<string> queryResult = new List<string>();
             if (Common.IsValidQueryBasic(queryString))
             {
-                string filterPart = DataMungerStep2.GetFilterPart(queryString);
+                string filterPart = QueryPartsOperations.GetFilterPart(queryString);
                 if (string.IsNullOrEmpty(filterPart))
                 {
                     queryResult = null;
@@ -133,6 +129,4 @@ namespace DataMunger
         }
         #endregion
     }
-    #endregion
 }
-#endregion

@@ -6,17 +6,13 @@
 // 2020-09-05 | Part1 all step completed
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using DataMunger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-#endregion
 
-#region Namespace
 namespace datamungerstep1_Console
 {
-    #region Class
     public class Program
     {
         /// <summary>
@@ -67,52 +63,52 @@ namespace datamungerstep1_Console
                 {
                     case 1:
                         //Split the querseley into words
-                        DisplaySplitResult(DataMungerStep1.SplitQueryWords(queryString));
+                        DisplaySplitResult(BasicQueryOperations.SplitQueryWords(queryString));
                         break;
 
                     case 2:
                         //Get filename from query
-                        DisplayResult(DataMungerStep1.GetFileNameFromQuery(queryString));
+                        DisplayResult(BasicQueryOperations.GetFileNameFromQuery(queryString));
                         break;
 
                     case 3:
                         //Get base part of query
-                        DisplayResult(DataMungerStep1.GetBasePartFromQuery(queryString));
+                        DisplayResult(BasicQueryOperations.GetBasePartFromQuery(queryString));
                         break;
 
                     case 4:
                         //Get selected fields fo query
-                        DisplaySplitResult(DataMungerStep2.GetSelectedFields(queryString));
+                        DisplaySplitResult(QueryPartsOperations.GetSelectedFields(queryString));
                         break;
 
                     case 5:
                         //Get filter part
-                        DisplayResult(DataMungerStep2.GetFilterPart(queryString));
+                        DisplayResult(QueryPartsOperations.GetFilterPart(queryString));
                         break;
 
                     case 6:
                         //Get conditions in filter part
-                        DisplaySplitResult(DataMungerStep2.GetConditionInFilter(queryString));
+                        DisplaySplitResult(QueryPartsOperations.GetConditionInFilter(queryString));
                         break;
 
                     case 7:
                         //Get logical operators in filter part
-                        DisplaySplitResult(DataMungerStep3.GetLogicalOperators(queryString));
+                        DisplaySplitResult(LogicalAndOrderFields.GetLogicalOperators(queryString));
                         break;
 
                     case 8:
                         //Get order by fields
-                        DisplaySplitResult(DataMungerStep3.GetOrderField(queryString));
+                        DisplaySplitResult(LogicalAndOrderFields.GetOrderField(queryString));
                         break;
 
                     case 9:
                         //Get group by fields
-                        DisplaySplitResult(DataMungerStep4.GetGroupByField(queryString));
+                        DisplaySplitResult(GroupAndAggregateFields.GetGroupByField(queryString));
                         break;
 
                     case 10:
                         //Get aggregate functions
-                        DisplaySplitResult(DataMungerStep4.GetAggregateFunctions(queryString));
+                        DisplaySplitResult(GroupAndAggregateFields.GetAggregateFunctions(queryString));
                         break;
 
                     default:
@@ -163,6 +159,4 @@ namespace datamungerstep1_Console
         }
 
     }
-    #endregion
-} 
-#endregion
+}

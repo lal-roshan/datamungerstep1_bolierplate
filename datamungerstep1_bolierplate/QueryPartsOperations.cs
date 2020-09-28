@@ -6,20 +6,16 @@
 // 2020-09-05 | Conditions part further modified
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using System.Collections.Generic;
 using System.Linq;
 using DataMunger.Utilities;
-#endregion
 
-#region Namespace
 namespace DataMunger
 {
-    #region Class
     /// <summary>
     /// Class containing parts of step 2
     /// </summary>
-    public class DataMungerStep2
+    public class QueryPartsOperations
     {
 
         #region Get Selected Fields
@@ -221,6 +217,4 @@ namespace DataMunger
         }
         #endregion
     }
-    #endregion
 }
-#endregion

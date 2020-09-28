@@ -29,7 +29,7 @@ namespace test
         {
             string queryString = "select * from table1 where col = 'Delhi' and area > 10000 or population < 500";
             List<string> queryResult = new List<string> { "and", "or" };
-            Assert.Equal(queryResult, DataMungerStep3.GetLogicalOperators(queryString));
+            Assert.Equal(queryResult, LogicalAndOrderFields.GetLogicalOperators(queryString));
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace test
         [InlineData(null)]
         public void InvalidQueryLogicalOperatorsTest(string queryString)
         {
-            Assert.Null(DataMungerStep3.GetLogicalOperators(queryString));
+            Assert.Null(LogicalAndOrderFields.GetLogicalOperators(queryString));
         }
         #endregion
 
@@ -56,7 +56,7 @@ namespace test
         {
             string queryString = "select * from ipl.csv where season > 2016 and city= 'Bangalore' order by win_by_runs, city";
             List<string> queryResult = new List<string> { "win_by_runs", "city" };
-            Assert.Equal(queryResult, DataMungerStep3.GetOrderField(queryString));
+            Assert.Equal(queryResult, LogicalAndOrderFields.GetOrderField(queryString));
         }
 
         [Theory]
@@ -66,7 +66,7 @@ namespace test
         [InlineData(null)]
         public void InvalidQueryOrderFieldTest(string queryString)
         {
-            Assert.Null(DataMungerStep3.GetOrderField(queryString));
+            Assert.Null(LogicalAndOrderFields.GetOrderField(queryString));
         } 
         #endregion
     } 

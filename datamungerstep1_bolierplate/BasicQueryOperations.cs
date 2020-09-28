@@ -5,17 +5,13 @@
 // 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using DataMunger.Utilities;
 using System.Collections.Generic;
 using System.Linq;
-#endregion
 
-#region Namespace
 namespace DataMunger
 {
-    #region Class
-    public class DataMungerStep1
+    public class BasicQueryOperations
     {
         #region Split into words
         /// <summary>
@@ -119,6 +115,4 @@ namespace DataMunger
         }
         #endregion
     }
-    #endregion
 }
-#endregion
