@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using DataMunger.Exceptions;
 using DataMunger.Utilities;
 
 namespace DataMunger
@@ -35,41 +36,31 @@ namespace DataMunger
 
                 if ((selectIndex == 0) && (fromIndex > -1))
                 {
-                    ///select the part of query starting from select upto first from
-                    ///(even if there is no from in query it will be handled later)
+                    ///select the part of query starting from select upto last from
                     queryString = queryString.Trim().Substring(selectIndex + 6, fromIndex - 6);
 
-                    ///if select keyword is found at first position and if there is a from in the query and
-                    ///if there are no other select or from keyword between the first select and from
-                    if (Common.StringMatchCount(queryString, "select") == Common.StringMatchCount(queryString, "from"))
-                    {
-                        //Get the strings between the select and from keyword as a list
-                        queryResult = queryString.Split(',').Select(part => part.Trim()).ToList();
+                    ///Get the strings between the select and from keyword as a list
+                    queryResult = queryString.Split(',').Select(part => part.Trim()).ToList();
 
-                        ///Checks whether there are any selected field ending with ',' and
-                        ///whether there are any selected field keyword with space 
-                        ///(a part that has space will be an assignment)
-                        if (queryResult.Any(part => string.IsNullOrEmpty(part) ||
-                            (part.Contains(' ') && !part.Contains('='))))
-                        {
-                            queryResult = null;
-                        }
+                    ///Checks whether there are any selected field ending with ','
+                    ///and if there are no comma seperated fields and contains whitespace
+                    if (queryResult.Any(part => string.IsNullOrEmpty(part)) ||
+                        (queryResult.Count == 1 && (queryResult.First().Contains(' ') &&
+                        !queryResult.First().Contains('('))))
+                    {
+                        throw new InvalidQueryException($"Error in selected fields parts of the query!!");
                     }
                     else
                     {
-                        queryResult = null;
+                        return queryResult;
                     }
                 }
                 else
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException($"Query without from clause is invalid!!");
                 }
             }
-            else
-            {
-                queryResult = null;
-            }
-            return queryResult;
+            return null;
         }
         #endregion
 
@@ -81,7 +72,7 @@ namespace DataMunger
         /// <returns></returns>
         public static string GetFilterPart(string queryString)
         {
-            string queryResult = "";
+            string queryResult = null;
             if (Common.IsValidQueryBasic(queryString))
             {
                 /// get index after four letters of where word (5 as index starts from 0)
@@ -90,7 +81,7 @@ namespace DataMunger
                 ///a valid query will have a where clause minimum at 16th position.Eg: select * from t 
                 if (whereIndex > 15)
                 {
-                    int endIndex = -1;
+                    int endIndex;
                     int orderIndex = Common.GetStringIndex(queryString, "order by", Common.Index.Last);
                     int groupIndex = Common.GetStringIndex(queryString, "group by", Common.Index.Last);
 
@@ -110,17 +101,16 @@ namespace DataMunger
                     if (orderIndex > -1 && groupIndex > -1 &&
                         groupIndex > orderIndex && !queryString.Substring(orderIndex, groupIndex - orderIndex).Contains(")"))
                     {
-                        queryResult = null;
+                        throw new InvalidQueryException($"Invalid usage of group by or order by clause!!");
                     }
-                    ///if 'order by' or 'group by' comes before 'where' keyword
-                    ///either it means it has a subquery or the query is wrong
+                    ///'order by' or 'group by' comes after 'where' keyword
                     else if (endIndex > whereIndex)
                     {
-                        //Getting the part of query between 'where' and 'orderby' or 'group by' clause
+                        ///Getting the part of query between 'where' and 'orderby' or 'group by' clause
                         queryString = queryString.Substring(whereIndex, endIndex - whereIndex).Trim();
 
-                        //if there is a bracket it means where keyword is inside a subquery and
-                        //outer query only has order by which means there are no filters
+                        ///if there is a bracket it means where keyword is inside a subquery and
+                        ///outer query only has order by which means there are no filters
                         if (queryString.Contains(")") ||
                             queryString.Length == 0)
                         {
@@ -129,11 +119,11 @@ namespace DataMunger
                         else
                         {
                             queryString = Common.StringReplace(queryString, "where").Trim();
-                            // minimum length for a filter without white space is 3 and with white space is 5 Eg: 1=3,1 = 3
+                            /// minimum length for a filter without white space is 3 and with white space is 5 Eg: 1=3,1 = 3
                             if ((queryString.Length < 5 && queryString.Contains(" ")) ||
                                 (queryString.Length < 3 && !queryString.Contains(" ")))
                             {
-                                queryResult = null;
+                                throw new InvalidQueryException($"Invalid filter part in the query!!");
                             }
                             else
                             {
@@ -152,7 +142,7 @@ namespace DataMunger
                     ///the query is wrong
                     else
                     {
-                        queryResult = null;
+                        throw new InvalidQueryException($"Invalid filter part in the query!!");
                     }
                 }
                 ///If query doesnt have a where clause
@@ -164,12 +154,8 @@ namespace DataMunger
                 }
                 else
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException($"Invalid use of where clause in the query!!");
                 }
-            }
-            else
-            {
-                queryResult = null;
             }
             return queryResult;
         }
@@ -191,7 +177,7 @@ namespace DataMunger
             ///if the query is not valid
             if (string.IsNullOrEmpty(queryFilter))
             {
-                queryResult = null;
+                throw new InvalidQueryException("Invalid filter part in query!!");
             }
             ///if there is no filter part in the query
             else if (string.Equals(queryFilter, Common.NoFilterString))
@@ -210,7 +196,7 @@ namespace DataMunger
                 if (queryResult != null &&
                     queryResult.Any(x => Common.SplitConditionWords(x) == null))
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException("Invalid conditions in query!!");
                 }
             }
             return queryResult;

@@ -3,17 +3,15 @@
 // 20200902 | Initial commit Step1 task1 completion
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using System.Collections.Generic;
 using Xunit;
 using DataMunger;
-#endregion
+using System;
+using DataMunger.Exceptions;
 
-#region Namespace
 namespace test
 {
-    #region Class
-    public class Step1Tests
+    public class BasicQueryTests
     {
         #region QuerySplit
         /// <summary>
@@ -38,9 +36,11 @@ namespace test
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void SplitWordsQueryEmptyTest(string queryString)
+        [InlineData("select from where")]
+        public void SplitWordsQueryInvalidTest(string queryString)
         {
-            Assert.Null(BasicQueryOperations.SplitQueryWords(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => BasicQueryOperations.SplitQueryWords(queryString));
+            Assert.Equal(ex.Message, $"The query is invalid!!");
         }
         #endregion
 
@@ -63,9 +63,22 @@ namespace test
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void QueryEmptyTest(string queryString)
+        [InlineData("select from where")]
+        public void QueryInvalidTest(string queryString)
         {
-            Assert.Null(BasicQueryOperations.GetFileNameFromQuery(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => BasicQueryOperations.GetFileNameFromQuery(queryString));
+            Assert.Equal(ex.Message, $"The query is invalid!!");
+        }
+
+        /// <summary>
+        /// Test for checking whether the input query has a filename
+        /// </summary>
+        /// <param name="queryString">input string</param>
+        [Fact]
+        public void QueryNoFileTest()
+        {
+            string queryString = "select * from t where season > 2014 and city = 'Bangalore'";
+            Assert.Equal(BasicQueryOperations.GetFileNameFromQuery(queryString), $"Query doesn't contain any file name");
         }
         #endregion
 
@@ -88,12 +101,12 @@ namespace test
         [Theory]
         [InlineData(null)]
         [InlineData("")]
+        [InlineData("select from where")]
         public void QueryEmptyTestBase(string queryString)
         {
-            Assert.Null(BasicQueryOperations.GetBasePartFromQuery(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => BasicQueryOperations.GetBasePartFromQuery(queryString));
+            Assert.Equal(ex.Message, $"The query is invalid!!");
         }
         #endregion
     }
-    #endregion
-} 
-#endregion
+}

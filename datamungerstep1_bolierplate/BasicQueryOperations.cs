@@ -5,6 +5,7 @@
 // 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
+using DataMunger.Exceptions;
 using DataMunger.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,8 @@ namespace DataMunger
         /// <returns>List of words in query or null</returns>
         public static List<string> SplitQueryWords(string queryString)
         {
-            List<string> queryResult;
-            if (!Common.IsValidQueryBasic(queryString))
-            {
-                queryResult = null;
-            }
-            else
+            List<string> queryResult = null;
+            if (Common.IsValidQueryBasic(queryString))
             {
                 queryResult = queryString.Split(' ').ToList();
             }
@@ -99,7 +96,7 @@ namespace DataMunger
                        Common.StringMatchCount(queryString, "group by") > 0) &&
                        (!queryString.Contains('(') && !queryString.Contains(')')))
                     {
-                        return null;
+                        throw new InvalidQueryException($"Invalid use of where, order by or group by clause!!");
                     }
                     else
                     {

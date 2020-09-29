@@ -3,22 +3,18 @@
 // 2020-09-04 | Initial commit part1 step 3 completed
 /////////////////////////////////////////////////////////////
 
-#region  Usings
 using DataMunger;
+using DataMunger.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
-#endregion
 
-#region Namespace
 namespace test
 {
-    #region  Class
     /// <summary>
     /// Class containing test methods for step3 of part1
     /// </summary>
-    public class Step3Tests
+    public class LogicalAndOrderFieldsTests
     {
         #region Logical Operators
         /// <summary>
@@ -37,13 +33,12 @@ namespace test
         /// </summary>
         /// <param name="queryString"></param>
         [Theory]
-        [InlineData("select * from")]
-        [InlineData("select * from table1 where col = 'Delhi' where area > 10000  ")]
-        [InlineData("")]
-        [InlineData(null)]
+        [InlineData("select * from table1 where col")]
+        [InlineData("select * from table1 where col = 'Delhi' if area > 10000  ")]
         public void InvalidQueryLogicalOperatorsTest(string queryString)
         {
-            Assert.Null(LogicalAndOrderFields.GetLogicalOperators(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => LogicalAndOrderFields.GetLogicalOperators(queryString));
+            Assert.Equal("Invalid conditions in query!!", ex.Message);
         }
         #endregion
 
@@ -60,17 +55,12 @@ namespace test
         }
 
         [Theory]
-        [InlineData("select * form")]
         [InlineData("select * from table order by city where city = 'Delhi'")]
-        [InlineData("")]
-        [InlineData(null)]
         public void InvalidQueryOrderFieldTest(string queryString)
         {
-            Assert.Null(LogicalAndOrderFields.GetOrderField(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => LogicalAndOrderFields.GetOrderField(queryString));
+            Assert.Equal("Invalid use of order by clause!!", ex.Message);
         } 
         #endregion
-    } 
-    #endregion
+    }
 }
-
-#endregion

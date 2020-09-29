@@ -3,20 +3,18 @@
 // 2020-09-03 | Initial Commit Part1 Step2 Completed
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using DataMunger;
+using DataMunger.Exceptions;
+using System;
 using System.Collections.Generic;
 using Xunit;
-#endregion
 
-#region Namespace
 namespace test
 {
-    #region Class
     /// <summary>
     /// Class contaitning test for step 2
     /// </summary>
-    public class Step2Tests
+    public class QueryPartsTests
     {
         #region SelectedFieldsTest
         /// <summary>
@@ -42,15 +40,37 @@ namespace test
         /// <param name="queryString">input string</param>
         [Theory]
         [InlineData("select from")]
-        [InlineData("select city, select from")]
-        [InlineData("select city, from")]
-        [InlineData("select city name from")]
-        [InlineData("select city name, place_name from")]
-        [InlineData(null)]
         [InlineData("")]
+        [InlineData(null)]
         public void InvalidQuerySelectedFieldsTests(string queryString)
         {
-            Assert.Null(QueryPartsOperations.GetSelectedFields(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetSelectedFields(queryString));
+            Assert.Equal(ex.Message, $"The query is invalid!!");
+        }
+
+        /// <summary>
+        /// Test for invalid select clause in query
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        [Theory]
+        [InlineData("select city, select from")]
+        public void InvalidSelectFieldsTests(string queryString)
+        {
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetSelectedFields(queryString));
+            Assert.Equal(ex.Message, $"Invalid use of select or from clause in the query!!");
+        }
+
+        /// <summary>
+        /// Test for checking errors in select fields part
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        [Theory]
+        [InlineData("select city, from")]
+        [InlineData("select city name from")]
+        public void InvalidSelectedFieldsTests(string queryString)
+        {
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetSelectedFields(queryString));
+            Assert.Equal(ex.Message, $"Error in selected fields parts of the query!!");
         }
         #endregion
 
@@ -71,20 +91,42 @@ namespace test
         /// <summary>
         /// Method to test getting filter part of invalid query or empty
         /// </summary>
-        /// <param name="queryString"></param>
+        /// <param name="queryString">input query</param>
         [Theory]
-        [InlineData("Select city where from")]
-        [InlineData("Select city1 from order by city where city = 'Banglore'")]
-        [InlineData("Select city1 from group by city where city = 'Banglore'")]
         [InlineData("Select city1 from city where city = 'Banglore' order by city group by city")]
-        [InlineData("")]
         public void InvalidQueryFilterPartTest(string queryString)
         {
-            Assert.Null(QueryPartsOperations.GetFilterPart(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetFilterPart(queryString));
+            Assert.Equal(ex.Message, $"Invalid use of order by or group by clause in the query!!");
+        }
+
+        /// <summary>
+        /// test for invalid group by or order by in query
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        [Theory]
+        [InlineData("Select city1 from order by city where city = 'Banglore'")]
+        [InlineData("Select city1 from group by city where city = 'Banglore'")]
+        public void InvalidOrderGroupByTest(string queryString)
+        {
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetFilterPart(queryString));
+            Assert.Equal(ex.Message, $"Invalid filter part in the query!!");
+        }
+
+        /// <summary>
+        /// test for invalid where part
+        /// </summary>
+        /// <param name="queryString">input query</param>
+        [Theory]
+        [InlineData("Select city where from")]
+        public void InvalidWhereFilterPartTest(string queryString)
+        {
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetFilterPart(queryString));
+            Assert.Equal(ex.Message, $"Invalid use of where clause in the query!!");
         }
         #endregion
 
-        #region Filter Part Condition
+        #region Condition
         /// <summary>
         /// Method to test getting filter part of query
         /// </summary>
@@ -101,18 +143,14 @@ namespace test
         /// </summary>
         /// <param name="queryString"></param>
         [Theory]
-        [InlineData("Select city where from")]
-        [InlineData("Select city1 from order by city where city = 'Banglore'")]
-        [InlineData("Select city1 from group by city where city = 'Banglore'")]
-        [InlineData("Select city1 from city where city = 'Banglore' order by city group by city")]
-        [InlineData("")]
+        [InlineData("Select city1 from city where city")]
+        [InlineData("Select city1 from city where city, id")]
         public void InvalidQueryConditionFilterPartTest(string queryString)
         {
-            Assert.Null(QueryPartsOperations.GetConditionInFilter(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() => QueryPartsOperations.GetConditionInFilter(queryString));
+            Assert.Equal("Invalid conditions in query!!", ex.Message);
         } 
         #endregion
 
     }
-    #endregion
 }
-#endregion

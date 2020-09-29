@@ -3,6 +3,7 @@
 // 2020-09-05 | Part1 all step completed
 /////////////////////////////////////////////////////////////
 
+using DataMunger.Exceptions;
 using DataMunger.Utilities;
 using System;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace DataMunger
                             ///If group by isnt a part of subquery and where clause is present at last part, then the query is invalid
                             else
                             {
-                                queryResult = null;
+                                throw new InvalidQueryException("Invalid use of group by clause!!");
                             }
                         }
                         ///Checks whether the lsat part contains a ')' but no '(', implying that the group by is in a substring
@@ -91,12 +92,8 @@ namespace DataMunger
                 }
                 else
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException("Invalid query!!");
                 }
-            }
-            else
-            {
-                queryResult = null;
             }
             return queryResult;
         }
@@ -130,24 +127,28 @@ namespace DataMunger
                     queryResult = Common.SplitByString(basePart, aggregatePatterns.ToString(),
                                   Common.SplitType.RemoveAllButThis, true);
 
-
-                    if (queryResult != null && queryResult.Count == 0)
+                    if (queryResult == null)
                     {
+                        throw new InvalidQueryException("Invalid aggregate function usage in query!!");
+                    }
+                    else if (queryResult.Count == 0)
+                    {
+                        if (Common.SplitByString(basePart,
+                            "avg,min,max,count,sum", Common.SplitType.RemoveThis, true).Count > 0)
+                        {
+                            throw new InvalidQueryException("Invalid aggregate function usage in query!!");
+                        }
                         queryResult.Clear();
                         queryResult.Add(Common.NoAggregateFunctions);
                     }
                 }
                 else
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException("Invalid query!!");
                 }
             }
-            else
-            {
-                queryResult = null;
-            }
             return queryResult;
-        } 
+        }
         #endregion
     }
 }

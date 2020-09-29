@@ -3,20 +3,18 @@
 // 2020-09-05 | Part1 all step completed
 /////////////////////////////////////////////////////////////
 
-#region Usings
 using DataMunger;
+using DataMunger.Exceptions;
+using System;
 using System.Collections.Generic;
 using Xunit;
-#endregion
 
-#region Namespace
 namespace test
 {
-    #region Class
     /// <summary>
     /// Class contatining test methods for step 3
     /// </summary>
-    public class Step4Tests
+    public class GroupAndAggregateFieldsTests
     {
         #region Group by fields
         /// <summary>
@@ -31,14 +29,12 @@ namespace test
         }
 
         [Theory]
-        [InlineData("select * form")]
         [InlineData("select * from table group by city where city = 'Delhi'")]
-        [InlineData("select * from table where city = 'Delhi' order by id group by id")]
-        [InlineData("")]
-        [InlineData(null)]
         public void InvalidQueryGroupByFieldTest(string queryString)
         {
-            Assert.Null(GroupAndAggregateFields.GetGroupByField(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() =>
+            GroupAndAggregateFields.GetGroupByField(queryString));
+            Assert.Equal("Invalid use of group by clause!!", ex.Message);
         }
         #endregion
 
@@ -55,18 +51,14 @@ namespace test
         }
 
         [Theory]
-        [InlineData("select * form")]
-        [InlineData("select * from table group by city where city = 'Delhi'")]
-        [InlineData("select * from table where city = 'Delhi' order by id group by id")]
-        [InlineData("select avg(win_by_wickets) where min(win_by_runs), sum(score) from ipl.csv")]
-        [InlineData("")]
-        [InlineData(null)]
+        [InlineData("select avg(win_by_wickets) sum(id) from ipl.csv")]
+        [InlineData("select avg(win_by_wickets from ipl.csv")]
         public void InvalidQueryAggregateFunctionTest(string queryString)
         {
-            Assert.Null(GroupAndAggregateFields.GetAggregateFunctions(queryString));
+            Exception ex = Assert.Throws<InvalidQueryException>(() =>
+            GroupAndAggregateFields.GetAggregateFunctions(queryString));
+            Assert.Equal("Invalid aggregate function usage in query!!", ex.Message);
         }
         #endregion
-    } 
-    #endregion
-} 
-#endregion
+    }
+}

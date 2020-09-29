@@ -4,6 +4,7 @@
 // 2020-09-05 | Functionalities improved Part1 all step completed
 /////////////////////////////////////////////////////////////
 
+using DataMunger.Exceptions;
 using DataMunger.Utilities;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace DataMunger
                 string filterPart = QueryPartsOperations.GetFilterPart(queryString);
                 if (string.IsNullOrEmpty(filterPart))
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException("Invalid filter part in query!!");
                 }
                 else if (string.Equals(filterPart, Common.NoFilterString))
                 {
@@ -43,13 +44,13 @@ namespace DataMunger
                                   Common.SplitType.RemoveAllButThis);
                     if (queryResult != null && queryResult.Count == 0)
                     {
+                        if (Common.SplitConditionWords(filterPart) == null)
+                        {
+                            throw new InvalidQueryException("Invalid conditions in query!!");
+                        }
                         queryResult.Add(Common.NoLogicalOperatorsString);
                     }
                 }
-            }
-            else
-            {
-                queryResult = null;
             }
             return queryResult;
         }
@@ -93,7 +94,7 @@ namespace DataMunger
                             }
                             else
                             {
-                                queryResult = null;
+                                throw new InvalidQueryException("Invalid use of order by clause!!");
                             }
                         }
                         ///if last part is part of subquery
@@ -118,12 +119,8 @@ namespace DataMunger
                 }
                 else
                 {
-                    queryResult = null;
+                    throw new InvalidQueryException("Invalid query!!");
                 }
-            }
-            else
-            {
-                queryResult = null;
             }
             return queryResult;
         }

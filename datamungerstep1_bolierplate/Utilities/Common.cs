@@ -6,6 +6,7 @@
 // 2020-09-05 | Utility added for spliting conditions in query
 /////////////////////////////////////////////////////////////
 
+using DataMunger.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -200,7 +201,7 @@ namespace DataMunger.Utilities
             ///(taking 15 as it is 0 based index)
             if (string.IsNullOrEmpty(queryString) || queryString.Length < 15)
             {
-                return false;
+                throw new InvalidQueryException($"The query is invalid!!");
             }
             else
             {
@@ -208,10 +209,10 @@ namespace DataMunger.Utilities
                 int fromIndex = GetStringIndex(queryString, "from");
 
                 ///Checks wether there is a select and from clause and whether there is atleast a character
-                ///between them (selectIndex + 6 is for 5 letters of select plus one for whitespace)
+                ///between them (selectIndex + 7 is for remining 5 letters from 's' of select plus one whitespace)
                 if (selectIndex == -1 || fromIndex == -1 || selectIndex + 7 == fromIndex)
                 {
-                    return false;
+                    throw new InvalidQueryException($"The query is invalid!!");
                 }
 
                 ///Calculating the count of each main keywords in string
@@ -224,14 +225,20 @@ namespace DataMunger.Utilities
                 ///if a query is valid there should be equal number of select and from keyword
                 ///similarly if a query has where , order by or group clauses there count 
                 ///cannot be greater than the select clause
-                if (selectCount != fromCount ||
-                   (whereCount > 0 && whereCount > selectCount) ||
-                   (orderByCount > 0 && orderByCount > selectCount) ||
+                if (selectCount != fromCount)
+                {
+                    throw new InvalidQueryException($"Invalid use of select or from clause in the query!!");
+                }
+                else if ((whereCount > 0 && whereCount > selectCount) ||
+                    (!AreWherePositionsValid(queryString)))
+                {
+                    throw new InvalidQueryException($"Invalid use of where clause in the query!!");
+                }
+                else if ((orderByCount > 0 && orderByCount > selectCount) ||
                    (groupByCount > 0 && groupByCount > selectCount) ||
-                   (!AreWherePositionsValid(queryString)) ||
                    (!AreOrderGroupPositionsValid(queryString)))
                 {
-                    return false;
+                    throw new InvalidQueryException($"Invalid use of order by or group by clause in the query!!");
                 }
                 return true;
             }
@@ -447,7 +454,7 @@ namespace DataMunger.Utilities
                     ///We need to ensure that if there are any valid conditions that are written without
                     ///space between the three parts
                     List<string> splitParts = Common.SplitByString(conditionString,
-                                        "=,!=,<,<=,>,>=", SplitType.DoNothing , true);
+                                        "=,!=,<,<=,>,>=", SplitType.DoNothing, true);
                     if (splitParts == null || splitParts.Count != 3)
                     {
                         conditionParts = null;
